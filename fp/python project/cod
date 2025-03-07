@@ -1,0 +1,847 @@
+class Carte:
+    def __init__(self, id_carte, titlu, descriere, autor):
+        self.__id_carte = id_carte
+        self.__titlu = titlu
+        self.__descriere = descriere
+        self.__autor = autor
+
+    def get_idcarte(self):
+        return self.__id_carte
+
+    def get_titlu(self):
+        return self.__titlu
+
+    def get_descriere(self):
+        return self.__descriere
+
+    def get_autor(self):
+        return self.__autor
+
+    # ------------------------------------------getteri
+    def set_id_carte(self, id_nou):
+        self.__id_carte = id_nou
+
+    def set_titlu(self, titlu_nou):
+        self.__titlu = titlu_nou
+
+    def set_descriere(self, descriere_noua):
+        self.__descriere = descriere_noua
+
+    def set_autor(self, autor_nou):
+        self.__autor = autor_nou
+
+    # -------------------------------------------setteri
+
+    def __str__(self):
+        return "Carte: " + str(
+            self.get_idcarte()) + "\nTitlu: " + self.get_titlu() + "\nDescriere: " + self.get_descriere() + "\nAutor: " + self.get_autor() + "\n"
+
+class Client:
+
+    def __init__(self,id_client,nume,cnp):
+        self.__id_client=id_client
+        self.__nume=nume
+        self.__cnp=cnp
+
+    def get_id_client(self):
+        return self.__id_client
+    def get_nume(self):
+        return self.__nume
+
+    def get_cnp(self):
+        return self.__cnp
+#-----------------------------------------getteri
+    def set_id_client(self,id_nou):
+        self.__id_client=id_nou
+
+    def set_nume(self,nume_nou):
+        self.__nume=nume_nou
+
+    def set_cnp(self,cnp_nou):
+        self.__cnp=cnp_nou
+#-----------------------------------------setteri
+    def __str__(self):
+        return "Client " + str(self.get_id_client()) + "\nNume: " + self.get_nume() + "\nCNP: " + str(self.get_cnp()) + "\n"
+
+class Inchiriere:
+    def __init__(self,id,id_carte,id_client):
+        self.__id=id
+        self.__id_carte=id_carte
+        self.__id_client=id_client
+
+    def get_id(self):
+        return self.__id
+
+    def get_id_carte(self):
+        return self.__id_carte
+
+    def get_id_client(self):
+        return self.__id_client
+
+    def set_id(self,id_nou):
+        self.__id=id_nou
+
+    def set_id_carte(self,id_carte_nou):
+        self.__id_carte=id_carte_nou
+
+    def set_id_client(self,id_client_nou):
+        self.__id_client=id_client_nou
+
+    def __str__(self):
+        return "Inchiriere: " + str(self.get_id()) + "\n" +\
+            "ID Carte: " + str(self.get_id_carte()) + "\n" +\
+            "ID Client: " + str(self.get_id_client()) + "\n"
+
+
+class CarteRepository():
+    def __init__(self):
+        self.__lista_carti = []
+
+    def get_all(self):
+        return self.__lista_carti
+
+    def get_carte_dupa_nume(self, nume_carte):
+        for i in range(0, len(self._lista)):
+            carte_curenta = self._lista[i]
+            if carte_curenta.get_titlu() == nume_carte:
+                return carte_curenta
+        return None
+
+    def gaseste_carte_dupa_id(self,id_carte):
+        for i in range(0,len(self.__lista_carti)):
+            carte_curenta = self.__lista_carti[i]
+            if carte_curenta.get_idcarte() == id_carte:
+                return i
+        return -1
+
+    def gaseste_carte_dupa_titlu(self,titlu_carte):
+        for i in range(0,len(self.__lista_carti)):
+            carte_curenta=self.__lista_carti[i]
+            if carte_curenta.get_titlu()==titlu_carte:
+                return carte_curenta
+        return -1
+
+    def gaseste_carte_dupa_id1(self,id_carte):
+        for i in range(0,len(self.__lista_carti)):
+            carte_curenta = self.__lista_carti[i]
+            if carte_curenta.get_idcarte() == id_carte:
+                return carte_curenta
+        return -1
+
+
+    def returneaza_carte(self, id_inchiriere):
+        self.returneaza_carte(id_inchiriere)
+
+    def get_carte_byid(self,id):
+        carti = self.get_all()
+        for carte in carti:
+            if carte.get_idcarte() == id:
+                return carte
+        return None
+
+    def adauga(self,carte):
+        id_carte = carte.get_idcarte()
+        if self.gaseste_carte_dupa_id(id_carte) != -1:
+            raise KeyError("Exista deja o carte cu acest ID !")
+        else:
+            self.__lista_carti.append(carte)
+
+    def sterge(self,id_carte):
+        if self.gaseste_carte_dupa_id(id_carte) == -1:
+            raise KeyError("Cartea cu acest ID nu exista !")
+        else:
+            index=self.gaseste_carte_dupa_id(id_carte)
+            self.__lista_carti.pop(index)
+
+    def modifica(self,id_carte,tiltu_nou,descriere_noua,autor_nou):
+        if self.gaseste_carte_dupa_id(id_carte) == -1:
+            raise KeyError("Cartea cu acest ID nu exista !")
+        else:
+            index=self.gaseste_carte_dupa_id(id_carte)
+            carte=self.__lista_carti[index]
+            carte.set_titlu(tiltu_nou)
+            carte.set_descriere(descriere_noua)
+            carte.set_autor(autor_nou)
+
+from Domeniu.Carte import Carte
+from Repository.CarteRepository import CarteRepository
+
+class CarteFileRepository(CarteRepository):
+
+    def __init__(self,nume_fisier):
+        super().__init__()
+        self.__nume_fisier = nume_fisier
+        self.citeste_din_fisier()
+
+    def adauga(self,carte):
+        super().adauga(carte)
+        self.scrie_in_fisier()
+
+    def modifica(self,carte):
+        super().modifica(carte)
+        self.scrie_in_fisier()
+
+    def sterge(self,id_carte):
+        super().sterge(id_carte)
+        self.scrie_in_fisier
+
+    def citeste_din_fisier(self):
+        try:
+            with open(self.__nume_fisier, "r") as f:
+                for linie in f:
+                    lista_atribute = linie.strip("\n").split(",")
+                    id = int(lista_atribute[0])
+                    titlu = lista_atribute[1]
+                    descriere = lista_atribute[2]
+                    autor = lista_atribute[3]
+                    carte = Carte(id, titlu, descriere, autor)
+                    super().adauga(carte)
+        except IOError:
+            raise IOError("Eroare la descchiderea fisierului " + self.__nume_fisier)
+
+    def scrie_in_fisier(self):
+        try:
+            with open(self.__nume_fisier, "w") as f:
+                lista_carti = super().get_all()
+                for carte in lista_carti:
+                    id = carte.get_idcarte()
+                    titlu = carte.get_titlu()
+                    descriere = carte.get_descriere()
+                    autor = carte.get_autor()
+                    linie = str(id) + "," + titlu + "," + descriere + "," + autor + "\n"
+                    f.write(linie)
+        except IOError:
+            raise IOError("Eroare la deschiderea fisierului " + self.__nume_fisier)
+
+class ClientRepository:
+    def __init__(self):
+        self.__lista_clienti = []
+
+    def get_all(self):
+        return self.__lista_clienti
+
+    def adauga(self,client):
+        if self.gaseste_client_dupa_id(client.get_id_client()) != -1:
+            raise KeyError ("Exista deja un client cu acest ID !")
+        else:
+            self.__lista_clienti.append(client)
+
+    def sterge(self,id):
+        if self.gaseste_client_dupa_id(id) == -1:
+            raise KeyError("Nu exista un client cu acest ID !")
+        else:
+            client=self.gaseste_client_dupa_id(id)
+            self.__lista_clienti.remove(client)
+
+    def modifica(self,id,nume_nou,cnp_nou):
+        if self.gaseste_client_dupa_id(id) == -1:
+            raise KeyError("Nu exista client cu acest ID !")
+        else:
+            client = self.gaseste_client_dupa_id(id)
+            client.set_nume(nume_nou)
+            client.set_cnp(cnp_nou)
+
+
+    def gaseste_client_dupa_nume(self,nume_client):
+        for i in range(0,len(self.__lista_clienti)):
+            client_curent=self.__lista_clienti[i]
+            if client_curent.get_nume()==nume_client:
+                return client_curent
+        return -1
+
+    def gaseste_client_dupa_id(self,id):
+        for i in range(0,len(self.__lista_clienti)):
+            client_curent=self.__lista_clienti[i]
+            if client_curent.get_id_client()==id:
+                return client_curent
+        return -1
+
+    def gaseste_client_dupa_id1(self,id):
+        for i in range(0,len(self.__lista_clienti)):
+            client_curent=self.__lista_clienti[i]
+            if client_curent.get_id_client()==id:
+                return client_curent
+        return -1
+
+from Domeniu.Client import Client
+from Repository.ClientRepository import ClientRepository
+
+class ClientFileRepository(ClientRepository):
+
+    def __init__(self,nume_fisier):
+        super().__init__()
+        self.__nume_fisier = nume_fisier
+        self.citeste_din_fisier()
+
+    def adauga(self,client):
+        super().adauga(client)
+        self.scrie_in_fisier()
+
+    def modifica(self,client):
+        super().modifica(client)
+        self.scrie_in_fisier()
+
+    def sterge(self,id):
+        super().sterge(id)
+        self.scrie_in_fisier
+
+    def citeste_din_fisier(self):
+        try:
+            with open(self.__nume_fisier, "r") as f:
+                linie = f.readline().strip("\n")
+                while linie != "":
+                    lista_atribute = linie.split(",")
+                    id = int(lista_atribute[0])
+                    nume = lista_atribute[1]
+                    cnp = lista_atribute[2]
+                    client = Client(id, nume, cnp)
+                    super().adauga(client)
+                    linie = f.readline().strip("\n")
+        except IOError:
+            raise IOError("Eroare la deschiderea fisierului " + self.__nume_fisier)
+
+    def scrie_in_fisier(self):
+        try:
+            with open(self.__nume_fisier, "w") as f:
+                lista_clienti = super().get_all()
+                for client in lista_clienti:
+                    id = client.get_id_client()
+                    nume = client.get_nume()
+                    cnp = client.get_cnp()
+                    linie = str(id) + "," + nume + "," + cnp + "\n"
+                    f.write(linie)
+        except IOError:
+            raise IOError("Eroare la deschiderea fisierului " + self.__nume_fisier)
+
+class InchiriereRepository:
+    def __init__(self,carte_repository,client_repository):
+        self.__lista_inchirieri = []
+        self.__carte_repository = carte_repository
+        self.__client_repository = client_repository
+
+    def get_all(self):
+        return self.__lista_inchirieri
+
+    def adauga(self,inchiriere):
+        id=inchiriere.get_id()
+        if self.gaseste_inchiriere_dupa_id(id) != -1:
+            raise KeyError("Inchirierea cu acest ID exista deja !")
+        else:
+            id_carte = inchiriere.get_id_carte()
+            id_client = inchiriere.get_id_client()
+            if self.__carte_repository.gaseste_carte_dupa_id(id_carte) == -1 or self.__client_repository.gaseste_client_dupa_id(id_client) == -1:
+                raise KeyError("Cartea sau clientul inchirierii nu exista !")
+            elif self.gaseste_inchiriere_dupa_carte_id_si_client_id(id_client,id_carte) != -1:
+                raise KeyError("Cartea cu acest id este deja inchiriata!")
+            else:
+                self.__lista_inchirieri.append(inchiriere)
+
+    def scoate(self,id_carte,id_client):
+        for i in  range(len(self.__lista_inchirieri)-1,-1,-1):
+            inchiriere_curenta = self.__lista_inchirieri[i]
+            if inchiriere_curenta.get_id_carte() == id_carte and inchiriere_curenta.get_id_client() == id_client:
+                self.__lista_inchirieri.remove(inchiriere_curenta)
+
+
+
+    def gaseste_inchiriere_dupa_id(self,id):
+        for i in range(0,len(self.__lista_inchirieri)):
+            inchiriere_curenta = self.__lista_inchirieri[0]
+            if inchiriere_curenta.get_id() == id:
+                return i
+        return -1
+
+    def gaseste_inchiriere_dupa_carte_id_si_client_id(self,id_client,id_carte):
+        for i in range(0,len(self.__lista_inchirieri)):
+            inchiriere_curenta = self.__lista_inchirieri[i]
+            if inchiriere_curenta.get_id_carte() == id_carte and inchiriere_curenta.get_id_client() == id_client:
+                return i
+        return -1
+
+    def exista_inchiriere_carte(self,id_carte):
+        for i in range(0, len(self.__lista_inchirieri)):
+            inchiriere_curenta = self.__lista_inchirieri[i]
+            if inchiriere_curenta.get_id_carte() == id_carte:
+                return True
+        return False
+
+    def gaseste_client_dupa_id(self, id_client):
+        for i in range(0, len(self.__lista_clienti)):
+            client_curent = self.__lista_clienti[i]
+            if client_curent.get_id_client() == id_client:
+                return client_curent
+        return -1
+
+from Domeniu.Carte import Carte
+class CarteController:
+    def __init__(self,repository):
+        self.__repository = repository
+
+    def get_all(self):
+        return self.__repository.get_all()
+
+    def adauga(self,id_carte,titlu,descriere,autor):
+        carte=Carte(id_carte,titlu,descriere,autor)
+        self.__repository.adauga(carte)
+
+    def sterge(self,id_carte):
+        self.__repository.sterge(id_carte)
+
+    def modifica(self,id_carte,titlu_nou,descriere_noua,autor_nou):
+        self.__repository.modifica(id_carte,titlu_nou,descriere_noua,autor_nou)
+
+from Domeniu.Client import Client
+class ClientController:
+    def __init__(self,repository):
+        self.__repository = repository
+
+    def get_all(self):
+        return self.__repository.get_all()
+
+    def adauga(self,id_client,nume,cnp):
+        client = Client(id_client,nume,cnp)
+        self.__repository.adauga(client)
+
+    def sterge(self,id_client):
+        self.__repository.sterge(id_client)
+
+    def modifica(self,id_client,nume_nou,cnp_nou):
+        self.__repository.modifica(id_client,nume_nou,cnp_nou)
+
+from Domeniu.Inchiriere import Inchiriere
+class InchiriereController:
+    def __init__(self,inchiriere_repository,carte_repository,client_repository):
+        self.__inchiriere_repository=inchiriere_repository
+        self.__carte_repository=carte_repository
+        self.__client_repository=client_repository
+
+
+    def get_all(self):
+        return self.__inchiriere_repository.get_all()
+
+    def adauga(self,id,id_carte,id_client):
+        inchiriere = Inchiriere(id,id_carte,id_client)
+        self.__inchiriere_repository.adauga(inchiriere)
+
+    def scoate(self,id_carte,id_client):
+        self.__inchiriere_repository.scoate(id_carte,id_client)
+
+    def exista_inchiriere_carte(self,id_carte):
+        return self.__inchiriere_repository.exista_inchiriere_carte(id_carte)
+
+    def returneaza_clienti_cu_carti_inchiriate(self):
+        dictionar = {}
+        inchirieri = self.get_all()
+        carti = self.__carte_repository.get_all()
+        for carte in carti:
+            nume_carte = carte.get_titlu()
+            dictionar[nume_carte] = 0
+
+        for inchiriere in inchirieri:
+            id_carte = inchiriere.get_id_carte()
+            carte = self.__carte_repository.gaseste_carte_dupa_id1(id_carte)
+            nume_carte = carte.get_titlu()
+            dictionar[nume_carte] += 1
+
+        dictionar_sortat = sorted(dictionar.items(), key=lambda d: (d[1], d[0]))
+        return dictionar_sortat
+
+    def inchiriaza_carte(self, id_inchiriere, id_carte, id_client):
+        if self.__carte_repository.gaseste_carte_dupa_id(id_carte) == -1 or self.__client_repository.gaseste_client_dupa_id(id_client) == -1:
+            raise KeyError("Cartea sau clientul inchirierii nu exista!")
+        elif self.exista_inchiriere_carte(id_carte):
+            raise KeyError("Cartea este deja inchiriata!")
+        else:
+            self.__inchiriere_repository.inchiriaza_carte(id_inchiriere, id_carte, id_client)
+
+    def returneaza_carte(self, id_inchiriere):
+        self.__inchiriere_repository.returneaza_carte(id_inchiriere)
+
+    def cele_mai_inchiriate_carti(self):
+        dictionar_carte_client = {}
+        inchirieri = self.get_all()
+        for inchiriere in inchirieri:
+            id_carte = inchiriere.get_id_carte()
+            carte = self.__carte_repository.gaseste_carte_dupa_id1(id_carte)
+            nume_carte = carte.get_titlu()
+            if nume_carte not in dictionar_carte_client:
+                dictionar_carte_client[nume_carte] = 1
+            else:
+                dictionar_carte_client[nume_carte] += 1
+
+        dictionar_carte_client_sortat = sorted(dictionar_carte_client.items(), key=lambda d:(d[1],d[0]) , reverse=True)
+        return dictionar_carte_client_sortat
+
+    def primele10_cele_mai_putin(self):
+        dictionar = {}
+        inchirieri = self.get_all()
+        carti = self.__carte_repository.get_all()
+        for carte in carti:
+            nume_carte = carte.get_titlu()
+            dictionar[nume_carte] = 0
+
+
+        for inchiriere in inchirieri:
+            id_carte = inchiriere.get_id_carte()
+            carte = self.__carte_repository.gaseste_carte_dupa_id1(id_carte)
+            nume_carte = carte.get_titlu()
+            dictionar[nume_carte] += 1
+
+
+        dictionar_sortat = sorted(dictionar.items(),key=lambda d:(d[1],d[0]))
+        return dictionar_sortat
+
+import random
+import string
+
+class UI:
+    def __init__(self,carte_controller,client_controller,inchiriere_controller,carte_repository,client_repository):
+        self.__carte_controller = carte_controller
+        self.__client_controller = client_controller
+        self.__inchiriere_controller = inchiriere_controller
+        self.__carte_repository = carte_repository
+        self.__client_repository = client_repository
+
+    def returneaza_meniu(self):
+        meniul_meu="\nMeniu:\n"
+        meniul_meu+="1.Adauga carte\n"
+        meniul_meu+="2.Adauga client\n"
+        meniul_meu+="3.Afiseaza cartile\n"
+        meniul_meu+="4.Afiseaza clientii\n"
+        meniul_meu+="5.Sterge lista de carti.txt\n"
+        meniul_meu+="6.Sterge lista de clienti\n"
+        meniul_meu+="7.Modifica lista de carti.txt\n"
+        meniul_meu+="8.Modifica lista de clienti\n"
+        meniul_meu+="9.Cauta carte\n"
+        meniul_meu+="10.Cauta client\n"
+        meniul_meu+="11.Inchiriaza carte\n"
+        meniul_meu+="12.Returneaza carte\n"
+        meniul_meu+="13.Vezi clientii cu carti.txt inchiriate ordonat\n"
+        meniul_meu+="14.Afiseaza inchiriierile\n"
+        meniul_meu+="15.Cele mai inchiriate carti.txt\n"
+        meniul_meu+="16.Primii 20% dintre cei mai activi clienti\n"
+        meniul_meu+="17.Primele 10% cele mai putin inchiriate carti.txt ordonate crescator dupa numarul de inchirieri si alfabetic dupa numele autorului\n"
+        meniul_meu+="0.Iesire\n"
+        return meniul_meu
+
+    def main(self):
+        ruleaza=True
+        while ruleaza:
+            meniul_meu = self.returneaza_meniu()
+            print(meniul_meu)
+            comanda = input("Introduceti comanda:")
+            if comanda == "1":
+                self.ui_adauga_carte()
+            elif comanda == "2":
+                self.ui_adauga_client()
+            elif comanda == "3":
+                self.ui_tipareste_carti()
+            elif comanda == "4":
+                self.ui_tipareste_clienti()
+            elif comanda == "5":
+                self.ui_sterge_carti()
+            elif comanda == "6":
+                self.ui_sterge_clienti()
+            elif comanda == "7":
+                self.ui_modifica_carte()
+            elif comanda == "8":
+                self.ui_modifica_client()
+            elif comanda == "9":
+                self.ui_cauta_carte()
+            elif comanda == "10":
+                self.ui_cauta_client()
+            elif comanda == "11":
+                self.ui_inchiriaza_carte()
+            elif comanda == "12":
+                self.ui_returneaza_carte()
+            elif comanda == "13":
+                self.ui_clienti_cu_carti_inchiriate()
+            elif comanda == "14":
+                self.ui_afiseaza_inchirieri()
+            elif comanda == "15":
+                self.ui_cele_mai_inchiriate_carti()
+            elif comanda == "16":
+                self.ui_primii_20()
+            elif comanda == "17":
+                self.ui_primele10_cele_mai_putin()
+    def ui_afiseaza_inchirieri(self):
+        lista_inchirieri = self.__inchiriere_controller.get_all()
+        for i in lista_inchirieri:
+            print(i)
+    def ui_adauga_carte(self):
+        try:
+            #id = int(input("Introduceti ID-ul cartii:"))#self.ui_idgenerator
+            #titlu = input("Introduceti titlul cartii:")
+            #descriere = input("Introduceti descrierea cartii:")
+            #autor = input("Introduceti autorul:")
+            id = self.ui_id_generator()
+            titlu = self.ui_nume_generator()
+            descriere = self.ui_nume_generator()
+            autor = self.ui_nume_generator()
+            self.__carte_controller.adauga(id,titlu,descriere,autor)
+        except ValueError:
+            print("Date gresite! Reincercati!")
+        #except DuplicateIDException as de:
+         #   print(de)
+        #except IOError as ioe:
+         #   print(ioe)
+        #except ValueError:
+         #   print("Date gresite ! Reincercati !")
+        #except KeyError as ke:
+         #   print(ke)
+
+    def ui_adauga_client(self):
+        try:
+            #id = int(input("Introduceti ID-ul clientului:"))
+            #nume = input("Introduceti numele clientului:")
+            #cnp = int(input("Introduceti cnp-ul clientului: "))
+            id = self.ui_id_generator()
+            nume = self.ui_nume_generator()
+            cnp = self.ui_cnp_generator()
+            self.__client_controller.adauga(id,nume,cnp)
+        except ValueError:
+            print("Date gresite ! Rincercati !")
+        except KeyError as ke:
+            print(ke)
+
+    def ui_tipareste_carti(self):
+        carti = self.__carte_controller.get_all()
+        if len(carti) == 0:
+            print("Lista de carti.txt este goala !")
+        for carte in carti:
+            print(carte)
+
+    def ui_tipareste_clienti(self):
+        clienti = self.__client_controller.get_all()
+        if len(clienti) == 0:
+            print("Lista de clienti este goala !")
+        for client in clienti:
+            print(client)
+
+    def ui_sterge_carti(self):
+        try:
+            id = int(input("Introduceti id-ul cartii pe care doriti sa o stergeti:"))
+            if self.__inchiriere_controller.exista_inchiriere_carte(id) == True:
+                print("Exista deja o inchiriere ")
+            else:
+                self.__carte_controller.sterge(id)
+        except ValueError:
+            print("Date gresite ! Reincercati !")
+        except KeyError as ke:
+            print(ke)
+
+    def ui_sterge_clienti(self):
+        try:
+            id = int(input("Introduceti id-ul clientului pe care doriti sa o stergeti:"))
+            self.__client_controller.sterge(id)
+        except ValueError:
+            print("Date gresite ! Reincercati !")
+        except KeyError as ke:
+            print(ke)
+
+    def ui_modifica_carte(self):
+        try:
+            id = int(input("Introduceti id-ul cartii pe care doriti sa o modificati:"))
+            titlu_nou = input("Introduceti titlu nou:")
+            descriere_noua = input("Introduceti descriere noua:")
+            autor_nou = input("Introduceti noul autor:")
+            self.__carte_controller.modifica(id,titlu_nou,descriere_noua,autor_nou)
+        except ValueError:
+            print("Date gresite ! Reincercati !")
+        except KeyError as ke:
+            print(ke)
+
+    def ui_modifica_client(self):
+        try:
+            id = int(input("Introduceti id-ul clientului pe care doriti sa il modificati:"))
+            nume_nou = input("Introduceti nume nou:")
+            cnp_nou = input("Introduceti cnp-ul nou:")
+            self.__client_controller.modifica(id,nume_nou,cnp_nou)
+        except ValueError:
+            print("Date gresite ! Reincercati !")
+        except KeyError as ke:
+            print(ke)
+
+    def ui_clienti_cu_carti_inchiriate(self):
+        try:
+            carti = self.__inchiriere_controller.returneaza_clienti_cu_carti_inchiriate()
+            print(carti)
+        except ValueError:
+            print("Date gresite ! Reincercati !")
+
+    def ui_cauta_carte(self):
+        try:
+            id_carte = int(input("Introduceti ID-ul cartii pentru cautare: "))
+            carte_gasita = self.__carte_repository.gaseste_carte_dupa_id1(id_carte)
+
+            if carte_gasita is not None:
+                print("\nCarte gasita:\n", carte_gasita)
+            else:
+                print("\nNu s-a gasit nicio carte cu acest ID.")
+
+        except ValueError:
+            print("\nID-ul introdus nu este valid. Reincercati!")
+
+    def ui_cauta_client(self):
+        try:
+            id_client = int(input("Introduceti ID-ul clientului pentru cautare: "))
+            client_gasit = self.__client_repository.gaseste_client_dupa_id1(id_client)
+            if client_gasit is not None:
+                print("\nClient gasit:\n", client_gasit)
+            else:
+                print("\nNu s-a gasit niciun client cu acest ID.")
+
+        except ValueError:
+            print("\nID-ul introdus nu este valid. Reincercati!")
+
+    def ui_inchiriaza_carte(self):
+        try:
+            id_inchiriere = int(input("Introduceti ID-ul inchirierii: "))
+            id_carte = int(input("Introduceti ID-ul cartii: "))
+            id_client = int(input("Introduceti ID-ul clientului: "))
+            self.__inchiriere_controller.adauga(id_inchiriere, id_carte, id_client)
+            print("Inchiriere realizata cu succes!")
+        except ValueError:
+            print("Date gresite! Reincercati!")
+        except KeyError as ke:
+            print(ke)
+
+    def ui_returneaza_carte(self):
+        try:
+            id_carte = int(input("Introduceti ID-ul cartii pe care o returnati:"))
+            id_client = int(input("Introduceti ID-ul clientului care returneaza cartea:"))
+            self.__inchiriere_controller.scoate(id_carte,id_client)
+            print("Carte returnata cu succes!")
+        except ValueError:
+            print("Date gresite! Reincercati!")
+        except KeyError as ke:
+            print(ke)
+
+    def ui_cele_mai_inchiriate_carti(self):
+        cele_mai_inchiriate_carti = self.__inchiriere_controller.cele_mai_inchiriate_carti()
+        print(cele_mai_inchiriate_carti)
+
+    def ui_primii_20(self):
+        try:
+            numar_clienti = int(input("Introduceti numarul de clienti pe care doriti sa ii afisati:"))
+            #numar_clienti = int(0.2 * len(self.__lista_clienti)
+            carti = self.__inchiriere_controller.returneaza_clienti_cu_carti_inchiriate()
+            print(carti[:numar_clienti])
+        except ValueError:
+            print("Date gresite ! Reincercati !")
+
+    def ui_nume_generator(self,size = 6,chars=string.ascii_uppercase + string.digits):
+        return ''.join(random.choice(chars) for _ in range(size))
+
+    def ui_id_generator(self):
+        id = random.randint(100,1000)
+        return id
+
+    def ui_cnp_generator(self):
+        cnp = random.randint(3000000000000,5000000000000)
+        return cnp
+
+    def ui_primele10_cele_mai_putin(self):
+        try:
+            numar_carti = int(input("Introduceti numarul de carti.txt pe care doriti sa il afisati:"))
+            #numar_carti = int(0.1*len(self.__lista.inchirieri))
+            carti = self.__inchiriere_controller.primele10_cele_mai_putin()
+            print(carti[:numar_carti])
+        except ValueError:
+            print("Date gresite. Reincercati !")
+
+class Test:
+    def __init__(self):
+        self.carte_repository = CarteRepository()
+        self.client_repository = ClientRepository()
+        self.inchiriere_repository = InchiriereRepository(self.carte_repository, self.client_repository)
+        self.carte_controller = CarteController(self.carte_repository)
+        self.client_controller = ClientController(self.client_repository)
+        self.inchiriere_controller = InchiriereController(self.inchiriere_repository,self.carte_repository,self.client_repository)
+
+    def test_adauga_carte(self):
+        # Testare adăugare carte
+        carte = Carte(1,"Harry Potter", "Fantasy masterpiece", "J.K.Rrowling")
+        assert len(self.carte_repository.get_all()) == 0
+        self.carte_repository.adauga(carte)
+        id_carte = carte.get_idcarte()
+        #titlu = carte.get_titlu()
+        assert self.carte_repository.get_carte_byid(id_carte) == carte
+        assert carte.get_titlu() == "Harry Potter"
+        assert carte.get_descriere() == "Fantasy masterpiece"
+        assert carte.get_autor() == "J.K.Rrowling"
+        assert len(self.carte_repository.get_all()) == 1
+
+    def test_sterge_carte(self):
+        # Testare ștergere carte
+        self.carte_repository.sterge(1)
+        assert len(self.carte_repository.get_all()) == 0
+
+
+    def test_modifica_carte(self):
+        # Testare modificare carte
+        carte = Carte(1,"Harry Potter", "Fantasy masterpiece", "J.K.Rrowling")
+        self.carte_repository.adauga(carte)
+        self.carte_repository.modifica(carte.get_idcarte(), "Harry Potter 2", "Fantasy sequel 2", "J.K.Rowling 2")
+        assert carte.get_titlu() == "Harry Potter 2"
+        assert carte.get_descriere() == "Fantasy sequel 2"
+        assert carte.get_autor() == "J.K.Rowling 2"
+
+
+    def test_adauga_client(self):
+        # Testare adaugare client
+        client = Client(1,"John Doe", "1234567890")
+        self.client_repository.adauga(client)
+        assert client.get_nume() == "John Doe"
+        assert client.get_cnp() == "1234567890"
+        # Testare că lista de clienți s-a actualizat corespunzător
+        assert len(self.client_repository.get_all()) == 1
+
+
+
+    def test_sterge_client(self):
+        # Testare ștergere client
+        self.client_repository.sterge(1)
+        assert len(self.client_repository.get_all()) == 0
+
+
+
+    def test_modifica_client(self):
+        # Testare modificare client
+        client = Client(1,"John Doe", "1234567890")
+        self.client_repository.adauga(client)
+
+        self.client_repository.modifica(client.get_id_client(), "Jane Doe", "9876543210")
+        assert client.get_nume() == "Jane Doe"
+        assert client.get_cnp() == "9876543210"
+
+    def test_inchiriere_carte(self):
+        inchiriere = Inchiriere(1,1,1)
+        self.inchiriere_repository.adauga(inchiriere)
+        assert len(self.inchiriere_repository.get_all()) == 1
+
+
+    def test_returnare_carte(self):
+        # Testare returnare carte
+        self.inchiriere_repository.scoate(1, 1)
+        assert len(self.inchiriere_repository.get_all()) == 0
+
+    def rulare_teste():
+        #test_validator_carti()
+        #test_validator_client()
+        test = Test()
+        test.test_adauga_carte()
+        test.test_sterge_carte()
+        test.test_modifica_carte()
+        test.test_adauga_client()
+        test.test_sterge_client()
+        test.test_modifica_client()
+        test.test_inchiriere_carte()
+        test.test_returnare_carte()
+        test.test_cele_mai_inchiriate_carti()
+        print("Testetele au trecut cu succes !")
+
+
+rulare_teste()
+
+
